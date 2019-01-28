@@ -17,10 +17,14 @@ public:
   Matrix();
   Matrix(int);
   Matrix(const Matrix&) = default;
+  Matrix(Matrix&&) = default;
   ~Matrix() = default;
 
   int size() const;
   void display() const;
+
+  Matrix& operator=(const Matrix&) = default;
+  Matrix& operator=(Matrix&&) = default;
   double& operator()(int, int);
   double operator()(int, int) const;
 

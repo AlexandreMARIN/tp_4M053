@@ -27,7 +27,9 @@ int main(){
   cout << "A = \n" << A << "B = " << B;
 
   cout << "A+B = \n" << A+B;
-  cout << "A-B = \n" << A-B;
+  C = A - B;
+  cout << "A-B = \n";
+  C.display();
   cout << "A*B = \n" << A*B;
   cout << "2.*A = \n" << 2.*A;
 

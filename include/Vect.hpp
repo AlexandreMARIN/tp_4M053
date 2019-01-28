@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
-
+#include <iomanip>
 
 
 class Vect{
@@ -15,10 +15,15 @@ public:
   Vect();
   Vect(int);
   Vect(const Vect&) = default;
+  Vect(Vect&&) = default;
+  Vect(std::initializer_list<double>);
   ~Vect() = default;
 
   int size() const;
   void display() const;
+
+  Vect& operator=(const Vect&) = default;
+  Vect& operator=(Vect&&) = default;
   double& operator()(int);
   double operator()(int) const;
 

@@ -6,21 +6,23 @@ Vect::Vect() : N_(3), coef_(3){}
 
 Vect::Vect(int N) : N_(N), coef_(N){}
 
-/*Vect::Vect(const Vect& v) : N_(v.N_), coef_(v){
-
-  }*/
+Vect::Vect(initializer_list<double> il) : N_(il.size()), coef_(il.size()){
+  for(int i=0;i<N_;i++){
+    coef_[i] = il.begin()[i];
+  }
+}
 
 int Vect::size() const{
   return N_;
 }
 
 void Vect::display() const{
-  cout << "N_ : " << N_ << "\ncoef_ :\n( ";
+  cout << scientific << setprecision(2) << "N_ : " << N_ << "\ncoef_ :\n( ";
   if(coef_.size()){
-    cout << coef_[0];
+    cout << setw(10) << coef_[0];
   }
   for(unsigned int i=1;i<coef_.size();i++){
-    cout << ", " << coef_[i];
+    cout << ", " << setw(10) << coef_[i];
   }
   cout << " )\n\n";
 }

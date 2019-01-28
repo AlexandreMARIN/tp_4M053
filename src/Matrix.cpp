@@ -12,12 +12,12 @@ int Matrix::size() const{
 }
 
 void Matrix::display() const{
-  cout << "N_ : " << N_ << "\ncoef_ :\n";
+  cout << scientific << setprecision(2) << "N_ : " << N_ << "\ncoef_ :\n";
   for(unsigned int i=0;i<coef_.size();i++){
     if(i%((unsigned int)N_)==0u){
       cout << "|";
     }
-    cout << " " << coef_[i];
+    cout << " " << setw(10) << coef_[i];
     if((i%((unsigned int)N_))+1u==(unsigned int)N_){
       cout << " |\n";
     }
