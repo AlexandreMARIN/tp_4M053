@@ -25,6 +25,19 @@ void Matrix::display() const{
   cout << "\n\n";
 }
 
+void Matrix::diag(double alpha, int d){
+  if(d>=0){
+    for(int i=d;i<N_;i++){
+      coef_[i*N_+i-d] = alpha;
+    }
+  }else{
+    for(int i=0;i<N_+d;i++){
+      coef_[i*N_+i-d] = alpha;
+    }
+  }
+}
+
+
 double& Matrix::operator()(int i, int j){
   return coef_[i*N_+j];
 }

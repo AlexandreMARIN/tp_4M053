@@ -1,3 +1,4 @@
+#include <cmath>
 #include "../include/Vect.hpp"
 
 using namespace std;
@@ -27,6 +28,30 @@ void Vect::display() const{
   cout << " )\n\n";
 }
 
+void Vect::resize(int NN_){
+  N_ = NN_;
+  coef_.resize(NN_);
+}
+
+void Vect::set_to_zero(){
+  for(unsigned int i=0;i<coef_.size();i++){
+    coef_[i] = 0.0;
+  }
+}
+
+double Vect::norm_infty() const{
+  double res = abs(coef_[0]), aux;
+
+  for(int i=1;i<N_;i++){
+    aux = abs(coef_[i]);
+    if(aux>res){
+      res = aux;
+    }
+  }
+
+  return res;
+}
+
 double& Vect::operator()(int i){
   return coef_[i];
 }
@@ -47,6 +72,26 @@ ostream& operator<<(ostream& os, const Vect& v){
   os << " )\n\n";
 
   return os;
+}
+
+Vect operator+(const Vect& v1, const Vect& v2){
+
+  Vect sum(v1.N_);
+  for(int i=0;i<v1.N_;i++){
+    sum.coef_[i] = v1.coef_[i] + v2.coef_[i];
+  }
+  return sum;
+
+}
+
+Vect operator-(const Vect& v1, const Vect& v2){
+
+  Vect sum(v1.N_);
+  for(int i=0;i<v1.N_;i++){
+    sum.coef_[i] = v1.coef_[i] - v2.coef_[i];
+  }
+  return sum;
+
 }
 
 Vect operator*(double alpha, const Vect& v){

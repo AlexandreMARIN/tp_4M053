@@ -23,6 +23,8 @@ public:
   int size() const;
   void display() const;
 
+  void diag(double, int=0);
+
   Matrix& operator=(const Matrix&) = default;
   Matrix& operator=(Matrix&&) = default;
   double& operator()(int, int);

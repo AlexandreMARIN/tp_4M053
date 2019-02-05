@@ -22,6 +22,11 @@ public:
   int size() const;
   void display() const;
 
+  void resize(int);
+  void set_to_zero();
+
+  double norm_infty() const;
+
   Vect& operator=(const Vect&) = default;
   Vect& operator=(Vect&&) = default;
   double& operator()(int);
@@ -30,17 +35,11 @@ public:
 
 
   friend std::ostream& operator<<(std::ostream&, const Vect&);
+  friend Vect operator+(const Vect&, const Vect&);
+  friend Vect operator-(const Vect&, const Vect&);
   friend Vect operator*(double, const Vect&);
 
 };
-
-
-
-
-
-
-
-
 
 
 
