@@ -39,6 +39,12 @@ void Vect::set_to_zero(){
   }
 }
 
+void Vect::fill(double alpha){
+  for(int i=0;i<N_;i++){
+    coef_[i] = alpha;
+  }
+}
+
 double Vect::norm_infty() const{
   double res = abs(coef_[0]), aux;
 
@@ -58,6 +64,20 @@ double& Vect::operator()(int i){
 
 double Vect::operator()(int i) const{
   return coef_[i];
+}
+
+const Vect& Vect::operator+=(const Vect& v){
+  for(int i=0;i<N_;i++){
+    coef_[i] += v.coef_[i];
+  }
+  return *this;
+}
+
+const Vect& Vect::operator*=(double alpha){
+  for(int i=0;i<N_;i++){
+    coef_[i] *= alpha;
+  }
+  return *this;
 }
 
 

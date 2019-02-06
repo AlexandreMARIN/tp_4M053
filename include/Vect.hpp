@@ -24,6 +24,7 @@ public:
 
   void resize(int);
   void set_to_zero();
+  void fill(double);
 
   double norm_infty() const;
 
@@ -31,7 +32,8 @@ public:
   Vect& operator=(Vect&&) = default;
   double& operator()(int);
   double operator()(int) const;
-
+  const Vect& operator+=(const Vect&);
+  const Vect& operator*=(double);
 
 
   friend std::ostream& operator<<(std::ostream&, const Vect&);

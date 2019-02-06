@@ -25,8 +25,16 @@ void IterSolver::set_n_max(int n_max){
   }
 }
 
-Vect& IterSolver::get_x(){
+const Vect& IterSolver::get_x(){
   return x_;
+}
+
+int IterSolver::get_niter(){
+  return niter_;
+}
+
+const Vect& IterSolver::get_r(){
+  return r_;
 }
 
 void IterSolver::solve(){
@@ -63,6 +71,9 @@ void IterSolver::check(){
 }
 
 
+
+Jacobi Jacobi::obj;
+
 Jacobi::Jacobi() : IterSolver(){}
 
 void Jacobi::check(){
@@ -88,5 +99,70 @@ Jacobi& Jacobi::getobj(){
   return obj;
 }
 
-Jacobi Jacobi::obj;
+
+
+GaussSeidel GaussSeidel::obj;
+
+GaussSeidel::GaussSeidel() : IterSolver(){}
+
+void GaussSeidel::check(){
+
+  //A_'s diagonal must not contain any zero
+  for(int i=0;i<A_->size();i++){
+    if((*A_)(i, i)==0.0){
+      throw(invalid_argument("GaussSeidel : A_'s diagonal must not contain any zero\n"));
+    }
+  }
+
+}
+
+void GaussSeidel::update_solution(){
+
+  Vect y = solve_triang_sup(*A_, r_);
+  x_ += y;
+
+}
+
+GaussSeidel& GaussSeidel::getobj(){
+  return obj;
+}
+
+
+Relax Relax::obj;
+
+Relax::Relax() : IterSolver(), omega_(0.0){}
+
+void Relax::check(){
+
+  if(omega_<=0. || omega_>=2.0){
+    throw(invalid_argument("Relax : omega_ must be in ]0, 2[\n"));
+  }
+
+  //A_'s diagonal must not contain any zero
+  for(int i=0;i<A_->size();i++){
+    if((*A_)(i, i)==0.0){
+      throw(invalid_argument("Relax : A_'s diagonal must not contain any zero\n"));
+    }
+  }
+
+}
+
+void Relax::update_solution(){
+
+  Vect y = solve_triang_sup(*A_, r_);
+  y *= omega_;
+  x_ += y;
+
+}
+
+Relax& Relax::getobj(){
+  return obj;
+}
+
+void Relax::set_omega(double o){
+  omega_ = o;
+}
+
 Jacobi& Jacobi_ = Jacobi::getobj();
+GaussSeidel& GaussSeidel_ = GaussSeidel::getobj();
+Relax& Relax_ = Relax::getobj();

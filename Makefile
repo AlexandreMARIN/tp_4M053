@@ -3,7 +3,7 @@ OBJDIR	:= obj
 SRCDIR	:= src
 BINDIR	:= bin
 
-CXX      := g++
+CXX     := g++
 VPATH	:=
 LDFLAGS :=
 LIBRARY :=
@@ -14,7 +14,7 @@ SRCS = $(wildcard $(SRCDIR)/*.cpp)
 OBJS = $(subst $(SRCDIR)/,$(OBJDIR)/, $(subst .cpp,.o, $(SRCS)))
 
 # Define here your main source files separated by spaces (without suffix!)
-EXEC = test_Vect test_Matrix test_iter_solv
+EXEC = test_Vect test_Matrix test_iter_solv test_iter_solv2
 
 #Phony = do not represent a file
 #.PHONY: all
@@ -41,8 +41,8 @@ makedir :
 #For some debug
 .PHONY: print
 print :
-	echo $(SRCS)
-	echo $(OBJS)
+	@echo $(SRCS)
+	@echo $(OBJS)
 
 #Remarks:
 # $@ : filename representing the target
