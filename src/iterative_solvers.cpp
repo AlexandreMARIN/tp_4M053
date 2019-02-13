@@ -143,6 +143,8 @@ void Relax::check(){
     if((*A_)(i, i)==0.0){
       throw(invalid_argument("Relax : A_'s diagonal must not contain any zero\n"));
     }
+
+    (*A_)(i, i) /= omega_;//not here : we must define another direct method for triangular systems
   }
 
 }
@@ -150,7 +152,6 @@ void Relax::check(){
 void Relax::update_solution(){
 
   Vect y = solve_triang_sup(*A_, r_);
-  y *= omega_;
   x_ += y;
 
 }
