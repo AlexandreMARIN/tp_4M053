@@ -95,7 +95,7 @@ int main(){
     b.resize(sizes[i]);
     b.fill(1.0);
     rho = cos(M_PI/(sizes[i]+1));
-    omg_star = 1.5;//2.0/(1.0+sqrt( 1.0 - rho*rho ));
+    omg_star = 2.0/(1.0+sqrt( 1.0 - rho*rho ));
     cout << "omg_star(" << sizes[i] << ") = " << omg_star << "\n";
     Relax_.set_omega(omg_star);
 
