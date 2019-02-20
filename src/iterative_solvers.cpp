@@ -2,6 +2,7 @@
 #include "../include/iterative_solvers.hpp"
 
 using namespace std;
+using namespace std::chrono;
 
 IterSolver::IterSolver() : A_(nullptr), b_(nullptr), tol_(1e-6), n_max_(100){}
 
@@ -33,8 +34,17 @@ int IterSolver::get_niter(){
   return niter_;
 }
 
+const vector<double>& IterSolver::get_resvec(){
+  return resvec_;
+}
+
 const Vect& IterSolver::get_r(){
   return r_;
+}
+
+long int IterSolver::get_duration(){
+  milliseconds dur = duration_cast<milliseconds>(end - begin);
+  return dur.count();
 }
 
 void IterSolver::solve(){
@@ -49,12 +59,14 @@ void IterSolver::solve(){
   x_.set_to_zero();
   r_ = *b_;
 
+  begin = high_resolution_clock::now();
   while( (rnorm=r_.norm_infty())>limit && niter_<n_max_ ){
     update_solution();
     r_ = *b_ - (*A_)*x_;
     resvec_.push_back((bnorm!=0.0)?rnorm/bnorm:numeric_limits<double>::quiet_NaN());
     niter_++;
   }
+  end = high_resolution_clock::now();
 
 }
 
