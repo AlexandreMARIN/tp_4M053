@@ -1,4 +1,6 @@
 #include "../include/Matrix.hpp"
+#include "../include/direct_solvers.hpp"
+#include <cmath>
 
 using namespace std;
 
@@ -25,6 +27,53 @@ void Matrix::display() const{
   cout << "\n\n";
 }
 
+void Matrix::display_LU() const{
+
+  if(!LU_){
+    return;
+  }
+  cout << scientific << setprecision(2) << "N_ : " << N_ << "\n";
+  cout << "PA = LU with\n";
+  //L
+  for(int i=0;i<N_;i++){
+    if(N_/2==i){
+      cout << "L = |";
+    }else{
+      cout << "    |";
+    }
+    for(int j=0;j<i;j++){
+      cout << setw(10) << coef_[i*N_+j];
+    }
+    cout << setw(10) << 1.0;
+    for(int j=i+1;j<N_;j++){
+      cout << setw(10) << 0.0;
+    }
+    cout << "|\n";
+  }
+  cout << "\n\n";
+  //U
+  for(int i=0;i<N_;i++){
+    if(N_/2==i){
+      cout << "U = |";
+    }else{
+      cout << "    |";
+    }
+    for(int j=0;j<i;j++){
+      cout << setw(10) << 0.0;
+    }
+    for(int j=i;j<N_;j++){
+      cout << setw(10) << coef_[i*N_+j];
+    }
+    cout << "|\n";
+  }
+
+  //perm
+  cout << "P is given by those operations (in that order):\n";
+  for(int i=0;i<N_-1;i++){
+    cout << "\t" << i << " <-> " << perm_[i] << "\n";
+  }
+}
+
 void Matrix::diag(double alpha, int d){
   if(d>=0){
     for(int i=d;i<N_;i++){
@@ -35,6 +84,59 @@ void Matrix::diag(double alpha, int d){
       coef_[i*N_+i-d] = alpha;
     }
   }
+}
+
+void Matrix::decomp_LU(){
+
+  int i, j, k, kmax;
+  double aux;
+  perm_.reserve(N_-1);
+
+  for(k=0;k<=N_-2;k++){
+
+    //we select the maximum of the entries below the entry (k, k) (included)
+    //then we swap two rows
+    aux = abs(coef_[k*(N_+1)]);
+    kmax = k;
+    for(i=1;i<N_-k;i++){
+      if(abs(coef_[(k+i)*N_+k])>aux){
+	aux = abs(coef_[(k+i)*N_+k]);
+	kmax = k+i;
+      }
+    }
+    perm_[k] = kmax;
+    for(i=k;i<N_;i++){
+      aux = coef_[k*N_+i];
+      coef_[k*N_+i] = coef_[kmax*N_+i];
+      coef_[kmax*N_+i] = aux;
+    }
+
+    for(i=1;i<N_-k;i++){
+      coef_[(k+i)*N_+k] /= coef_[k*(N_+1)];
+      for(j=1;j<N_-k;j++){
+	coef_[(k+i)*N_+k+j] -= coef_[(k+i)*N_+k]*coef_[k*N_+j+k];
+      }
+    }
+  }
+
+  LU_ = true;
+}
+
+Vect Matrix::solve_via_LU(const Vect& b){
+  if(!LU_){
+    this->decomp_LU();
+  }
+  //we solve LUx = Pb
+  Vect c(b);
+  double aux;
+  for(int i=0;i<N_-1;i++){
+    aux = c(i);
+    c(i) = c(perm_[i]);
+    c(perm_[i]) = aux;
+  }
+  //c is ready and equals Pb
+  c = solve_triang_inf_id(*this, c);
+  return solve_triang_sup(*this, c);
 }
 
 

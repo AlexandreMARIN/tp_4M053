@@ -14,7 +14,7 @@ SRCS = $(wildcard $(SRCDIR)/*.cpp)
 OBJS = $(subst $(SRCDIR)/,$(OBJDIR)/, $(subst .cpp,.o, $(SRCS)))
 
 # Define here your main source files separated by spaces (without suffix!)
-EXEC = test_Vect test_Matrix test_iter_solv test_iter_solv2 test_iter_solv3
+EXEC = test_Vect test_Matrix test_iter_solv test_iter_solv2 test_iter_solv3 test_LU
 
 #Phony = do not represent a file
 #.PHONY: all
