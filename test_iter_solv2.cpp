@@ -1,7 +1,10 @@
 #include <fstream>
 #include <cmath>
+#include <map>
+#include <string>
 
-#include "../include/iterative_solvers.hpp"
+
+#include "include/iterative_solvers.hpp"
 
 using namespace std;
 
@@ -18,23 +21,25 @@ Matrix create_A_N(int N){
 int main(){
 
   vector<int> sizes({2, 4, 8, 16, 32, 64, 128});
+  map<string, vector<vector<int> > > data;//use pairs or somethong like that
   double tol = 0.1;
+  int n_max = 100000;
 
   Jacobi_.set_tol(tol);
-  Jacobi_.set_n_max(100000);
+  Jacobi_.set_n_max(n_max);
 
   GaussSeidel_.set_tol(tol);
-  GaussSeidel_.set_n_max(100000);
+  GaussSeidel_.set_n_max(n_max);
 
   Relax_.set_tol(tol);
-  Relax_.set_n_max(100000);
+  Relax_.set_n_max(n_max);
 
 
 
-  ofstream file("Jacobi.data");
+  ofstream file("iter.json");
   Matrix A(0);
   Vect b(0);
-
+  vector<string> methods{"Jacobi", "GaussSeidel", "Relax"};
 
 
   Jacobi_.set_A(&A);
@@ -46,71 +51,91 @@ int main(){
   Relax_.set_A(&A);
   Relax_.set_b(&b);
 
-  //Jacobi
-  for(unsigned int i=0;i<sizes.size();i++){
-    A = create_A_N(sizes[i]);
-    b.resize(sizes[i]);
+  for(string& meth : methods){
+    data[meth] = vector<vector<int> >(3);
+    for(int i=0;i<3;i++){
+      data.at(meth)[i].reserve(sizes.size());
+    }
+  }
+
+  for(int s : sizes){
+    A = create_A_N(s);
+    b.resize(s);
     b.fill(1.0);
 
-    file << sizes[i] << " ";
+    //Jacobi
     Jacobi_.solve();
-    file << Jacobi_.get_niter() << " ";
+    data.at("Jacobi")[0].push_back(Jacobi_.get_niter());
 
     //"analytical assessment"
-    file << (log(tol)/log(cos(M_PI/(sizes[i]+1)))) << " ";
+    data.at("Jacobi")[1].push_back( ceil(log(tol)/log(cos(M_PI/(s+1)))) );
 
     //assessment no 3
-    file << -2.0*log(tol)*(sizes[i]+1)*(sizes[i]+1)/(M_PI*M_PI) << "\n";
-  }
+    data.at("Jacobi")[2].push_back( -2.0*log(tol)*(s+1)*(s+1)/(M_PI*M_PI) );
 
-  file.close();
-
-  file.open("GaussSeidel.data");
-  //Gauss-Seidel
-  for(unsigned int i=0;i<sizes.size();i++){
-    A = create_A_N(sizes[i]);
-    b.resize(sizes[i]);
-    b.fill(1.0);
-
-    file << sizes[i] << " ";
+    //GaussSeidel
     GaussSeidel_.solve();
-    cout << "A_*x_ = " << A*GaussSeidel_.get_x() << "\n\n";
-    file << GaussSeidel_.get_niter() << " ";
+    data.at("GaussSeidel")[0].push_back( GaussSeidel_.get_niter() );
 
     //"analytical assessment"
-    file << (log(tol)/(2.0*log(cos(M_PI/(sizes[i]+1))))) << " ";
+    data.at("GaussSeidel")[1].push_back( ceil(log(tol)/(2.0*log(cos(M_PI/(s+1))))) );
 
     //assessment no 3
-    file << -log(tol)*(sizes[i]+1)*(sizes[i]+1)/(M_PI*M_PI) << "\n";
-  }
+    data.at("GaussSeidel")[2].push_back( ceil(-log(tol)*(s+1)*(s+1)/(M_PI*M_PI)) );
 
-  file.close();
-
-
-  file.open("Relax.data");
-  //Relax
-  double omg_star, rho;
-  for(unsigned int i=0;i<sizes.size();i++){
-    A = create_A_N(sizes[i]);
-    b.resize(sizes[i]);
-    b.fill(1.0);
-    rho = cos(M_PI/(sizes[i]+1));
-    omg_star = 2.0/(1.0+sqrt( 1.0 - rho*rho ));
-    cout << "omg_star(" << sizes[i] << ") = " << omg_star << "\n";
+    //Relax
+    double rho = cos(M_PI/(s+1));
+    double omg_star = 2.0/(1.0+sqrt( 1.0 - rho*rho ));
     Relax_.set_omega(omg_star);
 
-    file << sizes[i] << " ";
     Relax_.solve();
-    cout << "A_*x_ = " << A*Relax_.get_x() << "\n\n";
-    file << Relax_.get_niter() << " ";
+    data.at("Relax")[0].push_back( Relax_.get_niter() );
 
     //"analytical assessment"
-    file << log(tol)/log(omg_star - 1.0) << " ";
+    data.at("Relax")[1].push_back( ceil(log(tol)/log(omg_star - 1.0)) );
 
     //assessment no 3
-    file << -log(tol)*(sizes[i]+1)/(M_PI*M_PI) << "\n";
+    data.at("Relax")[2].push_back( ceil(-log(tol)*(s+1)/(M_PI*M_PI)) );
   }
 
+
+  //we write the file here
+  //we use Json
+  vector<string> legend{"niter", "approx1", "approx2"};
+  file << "{\n";
+  //we write sizes, then measures are written
+  file << "\t\"sizes\" : [";
+  for(auto si=sizes.begin();si!=sizes.end();si++){
+    file << *si;
+    if(si!=sizes.end()-1){
+      file << ", ";
+    }
+  }
+  file << "],\n\n";
+
+  for(auto meth=methods.begin();meth!=methods.end();meth++){
+    file << "\t\"" << *meth << "\" : {\n\t\t";
+    for(int i=0;i<3;i++){
+      file << "\"" << legend[i] << "\" : [";
+      for(auto ptr=data.at(*meth)[i].begin();ptr!=data.at(*meth)[i].end();ptr++){
+	file << *ptr;
+	if(ptr!=data.at(*meth)[i].end()-1){
+	  file << ", ";
+	}
+      }
+      file << "]";
+      if(i<2){
+	file << ",\n\t\t";
+      }else{
+	file << "\n\t}";
+      }
+    }
+    if(meth!=methods.end()-1){
+      file << ",";
+    }
+    file << "\n";
+  }
+  file << "\n}";
   file.close();
 
 

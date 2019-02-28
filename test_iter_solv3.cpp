@@ -2,7 +2,7 @@
 #include <cmath>
 
 
-#include "../include/iterative_solvers.hpp"
+#include "include/iterative_solvers.hpp"
 
 using namespace std;
 using namespace std::chrono;
@@ -30,6 +30,7 @@ int main(){
 
   double tol = 1e-1;
   int n_max = 20000;
+  int N = 200;
   Matrix A(0);
   Vect b(0);
 
@@ -52,32 +53,74 @@ int main(){
 
 
 
-  //resvec
-  A = create_A_N(200);
-  b.resize(200);
+  //resvec + time
+  A = create_A_N(N);
+  b.resize(N);
   b.fill(1.0);
   vector<double> resvec;
   file.open("resvec.json");
-  file << "{\n\t\"Jacobi\" : {\n\t\t\"resvec\" : [";
+
+  file << "{\n\t";
+
+  //Jacobi
+  file << "\"Jacobi\" : {\n\t\t\"N\" : " << N << ",\n\t\t\"resvec\" : [";
   Jacobi_.solve();
   resvec = Jacobi_.get_resvec();
   file << resvec[0];
   for(unsigned int i=1;i<resvec.size();i++){
     file << ", " << resvec[i];
   }
+  file << "],\n\t\t\"sizes\" : [";
+  for(auto ptr = sizes.begin();ptr!=sizes.end();ptr++){
+    if(ptr!=sizes.begin()){
+      file << ", ";
+    }
+    file << *ptr;
+  }
+  file << "],\n\t\t\"duration\" : [";
+  for(auto ptr = sizes.begin();ptr!=sizes.end();ptr++){
+    A = create_A_N((*ptr));
+    b.resize((*ptr));
+    b.fill(1.0);
+    Jacobi_.solve();
+    if(ptr!=sizes.begin()){
+      file << ", ";
+    }
+    file << Jacobi_.get_duration();
+  }
   file << "]\n\t},\n";
 
-  file << "\n\t\"GaussSeidel\" : {\n\t\t\"resvec\" : [";
+  //GaussSeidel
+  file << "\n\t\"GaussSeidel\" : {\n\t\t\"N\" : " << N << ",\n\t\t\"resvec\" : [";
   GaussSeidel_.solve();
   resvec = GaussSeidel_.get_resvec();
   file << resvec[0];
   for(unsigned int i=1;i<resvec.size();i++){
     file << ", " << resvec[i];
   }
+  file << "],\n\t\t\"sizes\" : [";
+  for(auto ptr = sizes.begin();ptr!=sizes.end();ptr++){
+    if(ptr!=sizes.begin()){
+      file << ", ";
+    }
+    file << *ptr;
+  }
+  file << "],\n\t\t\"duration\" : [";
+  for(auto ptr = sizes.begin();ptr!=sizes.end();ptr++){
+    A = create_A_N((*ptr));
+    b.resize((*ptr));
+    b.fill(1.0);
+    GaussSeidel_.solve();
+    if(ptr!=sizes.begin()){
+      file << ", ";
+    }
+    file << GaussSeidel_.get_duration();
+  }
   file << "]\n\t},\n";
 
-  file << "\n\t\"Relax\" : {\n\t\t\"resvec\" : [";
-  rho = cos(M_PI/(201));
+  //Relax
+  file << "\n\t\"Relax\" : {\n\t\t\"N\" : " << N << ",\n\t\t\"resvec\" : [";
+  rho = cos(M_PI/(N+1));
   omg_star = 2.0/(1.0+sqrt( 1.0 - rho*rho ));
   Relax_.set_omega(omg_star);
   Relax_.solve();
@@ -86,57 +129,33 @@ int main(){
   for(unsigned int i=1;i<resvec.size();i++){
     file << ", " << resvec[i];
   }
-  file << "]\n\t}\n";
-  file << "}";
-  file.close();
-
-  //time
-
-  //Jacobi
-  file.open("J_time");
-  for(int s : sizes){
-    A = create_A_N(s);
-    b.resize(s);
-    b.fill(1.0);
-
-    file << s << " ";
-    Jacobi_.solve();
-    file << Jacobi_.get_duration() << "\n";
-
+  file << "],\n\t\t\"sizes\" : [";
+  for(auto ptr = sizes.begin();ptr!=sizes.end();ptr++){
+    if(ptr!=sizes.begin()){
+      file << ", ";
+    }
+    file << *ptr;
   }
-  file.close();
-
-  //GaussSeidel
-  file.open("GS_time");
-  for(int s : sizes){
-    A = create_A_N(s);
-    b.resize(s);
+  file << "],\n\t\t\"duration\" : [";
+  for(auto ptr = sizes.begin();ptr!=sizes.end();ptr++){
+    A = create_A_N((*ptr));
+    b.resize((*ptr));
     b.fill(1.0);
-
-    file << s << " ";
-    GaussSeidel_.solve();
-    file << GaussSeidel_.get_duration() << "\n";
-
-  }
-  file.close();
-
-  //Relax
-  file.open("R_time");
-
-  for(int s : sizes){
-    A = create_A_N(s);
-    b.resize(s);
-    b.fill(1.0);
-
-    file << s << " ";
-    rho = cos(M_PI/(s+1));
+    rho = cos(M_PI/((*ptr)+1));
     omg_star = 2.0/(1.0+sqrt( 1.0 - rho*rho ));
     Relax_.set_omega(omg_star);
     Relax_.solve();
-    file << Relax_.get_duration() << "\n";
-
+    if(ptr!=sizes.begin()){
+      file << ", ";
+    }
+    file << Relax_.get_duration();
   }
+  file << "]\n\t}\n";
+
+
+  file << "}";
   file.close();
+
 
 
   return 0;

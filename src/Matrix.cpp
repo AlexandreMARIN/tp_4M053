@@ -30,6 +30,7 @@ void Matrix::display() const{
 void Matrix::display_LU() const{
 
   if(!LU_){
+    cout << "The LU decomposition has not been computed\n";
     return;
   }
   cout << scientific << setprecision(2) << "N_ : " << N_ << "\n";
@@ -90,6 +91,11 @@ void Matrix::decomp_LU(){
 
   int i, j, k, kmax;
   double aux;
+
+  if(LU_){
+    return;
+  }
+
   perm_.reserve(N_-1);
 
   for(k=0;k<=N_-2;k++){
