@@ -20,12 +20,12 @@ Matrix create_A_N(int N){
 int main(){
 
   ofstream file;
-  constexpr int measures = 10;
+  constexpr int measures = 4;
 
   vector<int> sizes(measures);
-  sizes[0] = 10;
+  sizes[0] = 20;
   for(int i=1;i<measures;i++){
-    sizes[i] = sizes[i-1]+10;
+    sizes[i] = sizes[i-1]*2;
   }
 
   double tol = 1e-1;

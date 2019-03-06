@@ -11,9 +11,12 @@
 
 class Matrix{
 private:
+  enum state_ {NORMAL, LU, CHOLESKY} state = NORMAL;
+
   int N_;//number of lines and number of columns
   std::vector<double> coef_;//entries
   bool LU_ = false;
+  bool cholesky_ = false;
   std::vector<int> perm_;
 public:
   Matrix();
@@ -25,10 +28,13 @@ public:
   int size() const;
   void display() const;
   void display_LU() const;
+  void display_Cholesky() const;
 
   void diag(double, int=0);
   void decomp_LU();
+  void cholesky();
   Vect solve_via_LU(const Vect&);
+  Vect solve_via_Cholesky(const Vect&);
 
   Matrix& operator=(const Matrix&) = default;
   Matrix& operator=(Matrix&&) = default;

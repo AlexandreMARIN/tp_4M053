@@ -1,6 +1,7 @@
 #include "../include/Matrix.hpp"
 #include "../include/direct_solvers.hpp"
 #include <cmath>
+#include <cassert>
 
 using namespace std;
 
@@ -29,7 +30,7 @@ void Matrix::display() const{
 
 void Matrix::display_LU() const{
 
-  if(!LU_){
+  if(state!=LU){
     cout << "The LU decomposition has not been computed\n";
     return;
   }
@@ -75,6 +76,32 @@ void Matrix::display_LU() const{
   }
 }
 
+void Matrix::display_Cholesky() const{
+
+  if(state!=CHOLESKY){
+    cout << "The Cholesky decomposition has not been computed\n";
+    return;
+  }
+  cout << scientific << setprecision(2) << "N_ : " << N_ << "\n";
+  cout << "A = L(L^T) with\n";
+  //L
+  for(int i=0;i<N_;i++){
+    if(N_/2==i){
+      cout << "L = |";
+    }else{
+      cout << "    |";
+    }
+    for(int j=0;j<=i;j++){
+      cout << setw(10) << coef_[i*N_+j];
+    }
+    for(int j=i+1;j<N_;j++){
+      cout << setw(10) << 0.0;
+    }
+    cout << "|\n";
+  }
+  cout << "\n\n";
+}
+
 void Matrix::diag(double alpha, int d){
   if(d>=0){
     for(int i=d;i<N_;i++){
@@ -92,7 +119,7 @@ void Matrix::decomp_LU(){
   int i, j, k, kmax;
   double aux;
 
-  if(LU_){
+  if(state!=NORMAL){
     return;
   }
 
@@ -125,13 +152,36 @@ void Matrix::decomp_LU(){
     }
   }
 
-  LU_ = true;
+  state = LU;
+}
+
+void Matrix::cholesky(){
+  int i, j, k;
+
+  if(state!=NORMAL){
+    return;
+  }
+
+  for(k=0;k<N_;k++){
+    coef_[k*(N_+1)] = sqrt(coef_[k*(N_+1)]);
+    for(i=1;i<N_-k;i++){
+      coef_[(k+i)*N_+k] /= coef_[k*(N_+1)];
+      coef_[k*N_+k+i] = coef_[(k+i)*N_+k];
+      for(j=1;j<i;j++){
+	coef_[(k+i)*N_+k+j] -= coef_[(k+i)*N_+k]*coef_[(k+j)*N_+k];
+	coef_[(k+j)*N_+k+i] = coef_[(k+i)*N_+k+j];
+      }
+      coef_[(k+i)*(N_+1)] -= coef_[(k+i)*N_+k]*coef_[(k+i)*N_+k];
+    }
+  }
+
+  state = CHOLESKY;
 }
 
 Vect Matrix::solve_via_LU(const Vect& b){
-  if(!LU_){
-    this->decomp_LU();
-  }
+
+  assert(state==LU);
+
   //we solve LUx = Pb
   Vect c(b);
   double aux;
@@ -145,6 +195,14 @@ Vect Matrix::solve_via_LU(const Vect& b){
   return solve_triang_sup(*this, c);
 }
 
+Vect Matrix::solve_via_Cholesky(const Vect& b){
+
+  assert(state==CHOLESKY);
+
+  //we solve LL^T x = b
+  Vect c(solve_triang_inf(*this, b));
+  return solve_triang_sup(*this, c);
+}
 
 double& Matrix::operator()(int i, int j){
   return coef_[i*N_+j];

@@ -53,7 +53,7 @@ void IterSolver::solve(){
   double rnorm, bnorm=b_->norm_infty(), limit=bnorm*tol_;
 
   resvec_.resize(0);
-  resvec_.reserve(n_max_);
+  resvec_.reserve(n_max_+1);
   niter_ = 0;
   x_.resize(b_->size());
   x_.set_to_zero();
@@ -67,6 +67,7 @@ void IterSolver::solve(){
     niter_++;
   }
   end = high_resolution_clock::now();
+  resvec_.push_back((bnorm!=0.0)?rnorm/bnorm:numeric_limits<double>::quiet_NaN());
 
 }
 
