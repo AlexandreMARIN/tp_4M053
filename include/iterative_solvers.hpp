@@ -45,7 +45,7 @@ public:
   void solve();
   virtual void check();
   virtual void update_solution() = 0;
-
+  virtual void update_resvec();
 
 };
 

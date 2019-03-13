@@ -62,7 +62,7 @@ void IterSolver::solve(){
   begin = high_resolution_clock::now();
   while( (rnorm=r_.norm_infty())>limit && niter_<n_max_ ){
     update_solution();
-    r_ = *b_ - (*A_)*x_;
+    update_resvec();
     resvec_.push_back((bnorm!=0.0)?rnorm/bnorm:numeric_limits<double>::quiet_NaN());
     niter_++;
   }
@@ -83,6 +83,9 @@ void IterSolver::check(){
 
 }
 
+void IterSolver::update_resvec(){
+    r_ = *b_ - (*A_)*x_;
+}
 
 
 Jacobi Jacobi::obj;

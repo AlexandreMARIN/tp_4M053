@@ -33,6 +33,7 @@ public:
   double& operator()(int);
   double operator()(int) const;
   const Vect& operator+=(const Vect&);
+  const Vect& operator-=(const Vect&);
   const Vect& operator*=(double);
 
 
@@ -40,7 +41,7 @@ public:
   friend Vect operator+(const Vect&, const Vect&);
   friend Vect operator-(const Vect&, const Vect&);
   friend Vect operator*(double, const Vect&);
-
+  friend double operator,(const Vect&, const Vect&);
 };
 
 

@@ -73,6 +73,13 @@ const Vect& Vect::operator+=(const Vect& v){
   return *this;
 }
 
+const Vect& Vect::operator-=(const Vect& v){
+  for(int i=0;i<N_;i++){
+    coef_[i] -= v.coef_[i];
+  }
+  return *this;
+}
+
 const Vect& Vect::operator*=(double alpha){
   for(int i=0;i<N_;i++){
     coef_[i] *= alpha;
@@ -118,6 +125,14 @@ Vect operator*(double alpha, const Vect& v){
   Vect res(v.N_);
   for(unsigned int i=0;i<v.coef_.size();i++){
     res.coef_[i] = alpha*v.coef_[i];
+  }
+  return res;
+}
+
+double operator,(const Vect& a, const Vect& b){
+  double res = 0.0;
+  for(int i=0;i<a.N_;i++){
+    res += a.coef_[i] * b.coef_[i];
   }
   return res;
 }
