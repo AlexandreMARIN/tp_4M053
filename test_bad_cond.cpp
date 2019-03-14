@@ -39,7 +39,7 @@ int main(){
   double tol = 1e-3;
   b.fill(1.0);
   vector<double> resvec;
-  vector<double> alpha{2.0, 1.5, 1.2};
+  vector<double> alpha{2.0, 1.5, 1.2, 1.1, 1.05};
   Relax_.set_omega(1.5);
   Relax_.set_tol(tol);
   Relax_.set_n_max(n_max);
@@ -53,15 +53,23 @@ int main(){
   }
 
   file << "],\n";
-  file << "\t\"Relax\" : {\n\t\t\"resvec\" : []";
+  file << "\t\"Relax\" : {\n\t\t\"resvec\" : [";
 
-  for(double a : alpha){
-    A = create_bad_matrix(n, a);
+  for(auto a = alpha.begin();a!=alpha.end();a++){
+    A = create_bad_matrix(n, *a);
     Relax_.solve();
     resvec = Relax_.get_resvec();
+    file << "[" << resvec[0];
+    for(auto r = resvec.begin()+1;r!=resvec.end();r++){
+      file << ", " << *r;
+    }
+    file << "]";
+    if(a!=alpha.end()-1){
+      file << ",";
+    }
   }
 
-  file << "\n\t}\n}";
+  file << "]\n\t}\n}";
 
   return 0;
 }

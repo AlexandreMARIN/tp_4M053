@@ -70,3 +70,16 @@ plt.ylabel("durées (en microsecondes)")
 plt.xscale('log')
 plt.yscale('log')
 plt.show()
+
+##iterative solvers : bad matrices
+plt.figure(5)
+bad_file = open("bad_matrices.json")
+bad_data = json.load(bad_file)
+for i in range(len(bad_data["alpha"])):
+    plt.plot(bad_data["Relax"]["resvec"][i])
+plt.legend([r"$\alpha = $"+str(mess) for mess in bad_data["alpha"]])
+plt.title(r"Historiques de convergence (méthode de relaxation) pour $A_{"+str(bad_data["N"])+r"}^{\alpha}$ et $b=(1,\ ...\ , 1)$")
+plt.xlabel("itération $k$")
+plt.ylabel(r"$||r_{k}||_{\infty}/||b||_{\infty}$", fontsize='x-large')
+plt.yscale('log')
+plt.show()
