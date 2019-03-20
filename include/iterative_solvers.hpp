@@ -44,8 +44,8 @@ public:
 
   void solve();
   virtual void check();
-  virtual void update_solution() = 0;
-  virtual void update_resvec();
+  volatile virtual void update_solution() = 0;
+  volatile virtual void update_resvec();
 
 };
 
@@ -62,7 +62,7 @@ class Jacobi final : public IterSolver{
 public:
 
   void check() override;
-  void update_solution() override;
+  volatile void update_solution() override;
   static Jacobi& getobj();
 
 };
@@ -80,7 +80,7 @@ class GaussSeidel final : public IterSolver{
 public:
 
   void check() override;
-  void update_solution() override;
+  volatile void update_solution() override;
   static GaussSeidel& getobj();
 
 };
@@ -99,7 +99,7 @@ class Relax final : public IterSolver{
 public:
 
   void check() override;
-  void update_solution() override;
+  volatile void update_solution() override;
   static Relax& getobj();
   void set_omega(double);
 

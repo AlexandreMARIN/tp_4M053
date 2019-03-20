@@ -8,7 +8,7 @@ OptStepGrad::OptStepGrad() : IterSolver(){}
 
 void OptStepGrad::check(){}
 
-void OptStepGrad::update_solution(){
+volatile void OptStepGrad::update_solution(){
   double normA = (r_,((*A_)*r_));
   if(normA==0.0){
     n_max_ = niter_;
@@ -19,7 +19,7 @@ void OptStepGrad::update_solution(){
   x_ += aux;
 }
 
-void OptStepGrad::update_resvec(){
+volatile void OptStepGrad::update_resvec(){
   r_ -= (*A_)*aux;
 }
 

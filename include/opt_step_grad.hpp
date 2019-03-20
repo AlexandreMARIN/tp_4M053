@@ -20,8 +20,8 @@ public:
   static OptStepGrad obj;
 
   void check() override;
-  void update_solution() override;
-  void update_resvec() override;
+  volatile void update_solution() override;
+  volatile void update_resvec() override;
   static OptStepGrad& getobj();
 
 };

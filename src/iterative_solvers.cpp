@@ -62,7 +62,7 @@ void IterSolver::solve(){
   begin = high_resolution_clock::now();
   while( (rnorm=r_.norm_infty())>limit && niter_<n_max_ ){
     update_solution();
-    update_resvec();
+    this->update_resvec();
     resvec_.push_back((bnorm!=0.0)?rnorm/bnorm:numeric_limits<double>::quiet_NaN());
     niter_++;
   }
@@ -83,7 +83,7 @@ void IterSolver::check(){
 
 }
 
-void IterSolver::update_resvec(){
+volatile void IterSolver::update_resvec(){
     r_ = *b_ - (*A_)*x_;
 }
 
@@ -103,7 +103,7 @@ void Jacobi::check(){
 
 }
 
-void Jacobi::update_solution(){
+volatile void Jacobi::update_solution(){
 
   for(int i=0;i<x_.size();i++){
     x_(i) += r_(i)/(*A_)(i, i);
@@ -132,7 +132,7 @@ void GaussSeidel::check(){
 
 }
 
-void GaussSeidel::update_solution(){
+volatile void GaussSeidel::update_solution(){
 
   Vect y = solve_triang_sup(*A_, r_);
   x_ += y;
@@ -164,7 +164,7 @@ void Relax::check(){
 
 }
 
-void Relax::update_solution(){
+volatile void Relax::update_solution(){
 
   Vect y(r_);
   int i, j;
