@@ -2,8 +2,8 @@
 
 using namespace std;
 
-Matrix create_A_N(int N){
-  Matrix A_N(N);
+DenseMatrix create_A_N(int N){
+  DenseMatrix A_N(N);
 
   A_N.diag(2.0);
   A_N.diag(-1.0, 1);
@@ -24,7 +24,7 @@ int main(){
     n = 1;
   }
 
-  Matrix A(create_A_N(n));
+  DenseMatrix A(create_A_N(n));
 
 
   cout << "A :=\n";

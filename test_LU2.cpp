@@ -6,8 +6,8 @@ using namespace std;
 using namespace std::chrono;
 
 
-Matrix create_A_N(int N){
-  Matrix A_N(N);
+DenseMatrix create_A_N(int N){
+  DenseMatrix A_N(N);
 
   A_N.diag(2.0);
   A_N.diag(-1.0, 1);
@@ -19,7 +19,7 @@ Matrix create_A_N(int N){
 
 int main(){
 
-  Matrix A(0), B(0);
+  DenseMatrix A(0), B(0);
   high_resolution_clock::time_point begin, end;
   vector<int> sizes{5, 10, 20, 30, 60, 120};
   vector<int> LU_dur, Cholesky_dur;

@@ -7,8 +7,8 @@
 using namespace std;
 using namespace std::chrono;
 
-Matrix create_A_N(int N){
-  Matrix A_N(N);
+DenseMatrix create_A_N(int N){
+  DenseMatrix A_N(N);
 
   A_N.diag(2.0);
   A_N.diag(-1.0, 1);
@@ -31,7 +31,7 @@ int main(){
   double tol = 1e-1;
   int n_max = 20000;
   int N = 200;
-  Matrix A(0);
+  DenseMatrix A(0);
   Vect b(0);
 
   double omg_star, rho;

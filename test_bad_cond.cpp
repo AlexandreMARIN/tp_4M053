@@ -5,8 +5,8 @@
 using namespace std;
 
 
-Matrix create_bad_matrix(int n, double alpha){
-  Matrix A(n);
+DenseMatrix create_bad_matrix(int n, double alpha){
+  DenseMatrix A(n);
   int i, j;
   for(i=0;i<n;i++){
     for(j=0;j<i;j++){
@@ -33,7 +33,7 @@ int main(){
   }
 
   ofstream file("bad_matrices.json");
-  Matrix A(0);
+  DenseMatrix A(0);
   Vect b(n);
   int n_max = 1000;
   double tol = 1e-3;

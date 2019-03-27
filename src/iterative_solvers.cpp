@@ -77,9 +77,9 @@ void IterSolver::check(){
     throw(invalid_argument("IterSolver : members A_ and b_ are set to null\n"));
   }
 
-  if(A_->size()!=b_->size()){
+  /*  if(A_->size()!=b_->size()){
     throw(invalid_argument("IterSolver : matrix A_ and vector b_ must have the same size\n"));
-  }
+    }*/
 
 }
 
@@ -95,11 +95,11 @@ Jacobi::Jacobi() : IterSolver(){}
 void Jacobi::check(){
 
   //A_'s diagonal must not contain any zero
-  for(int i=0;i<A_->size();i++){
+  /*  for(int i=0;i<A_->size();i++){
     if((*A_)(i, i)==0.0){
       throw(invalid_argument("Jacobi : A_'s diagonal must not contain any zero\n"));
     }
-  }
+    }*/
 
 }
 
@@ -124,11 +124,11 @@ GaussSeidel::GaussSeidel() : IterSolver(){}
 void GaussSeidel::check(){
 
   //A_'s diagonal must not contain any zero
-  for(int i=0;i<A_->size();i++){
+  /*  for(int i=0;i<A_->size();i++){
     if((*A_)(i, i)==0.0){
       throw(invalid_argument("GaussSeidel : A_'s diagonal must not contain any zero\n"));
     }
-  }
+    }*/
 
 }
 
@@ -155,12 +155,12 @@ void Relax::check(){
   }
 
   //A_'s diagonal must not contain any zero
-  for(int i=0;i<A_->size();i++){
+  /*  for(int i=0;i<A_->size();i++){
     if((*A_)(i, i)==0.0){
       throw(invalid_argument("Relax : A_'s diagonal must not contain any zero\n"));
     }
 
-  }
+    }*/
 
 }
 

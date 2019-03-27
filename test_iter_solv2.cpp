@@ -8,8 +8,8 @@
 
 using namespace std;
 
-Matrix create_A_N(int N){
-  Matrix A_N(N);
+DenseMatrix create_A_N(int N){
+  DenseMatrix A_N(N);
 
   A_N.diag(2.0);
   A_N.diag(-1.0, 1);
@@ -37,7 +37,7 @@ int main(){
 
 
   ofstream file("iter.json");
-  Matrix A(0);
+  DenseMatrix A(0);
   Vect b(0);
   vector<string> methods{"Jacobi", "GaussSeidel", "Relax"};
 

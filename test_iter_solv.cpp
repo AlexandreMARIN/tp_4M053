@@ -6,7 +6,7 @@ int main(){
 
 
   cout << "We solve the linear system Ax = b where:\nA :=\n";
-  Matrix A(5);
+  DenseMatrix A(5);
   A.diag(2.);
   A.diag(-1.0, 1);
   A.diag(-1.0, -1);

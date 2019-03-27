@@ -16,7 +16,7 @@ int main(){
     n = 2;
   }
 
-  Matrix A(n);
+  DenseMatrix A(n);
   A.diag(2.0);
   A.diag(-1.0, 1);
   A.diag(-1.0, -1);

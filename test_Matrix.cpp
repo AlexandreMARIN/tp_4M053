@@ -5,8 +5,8 @@ using namespace std;
 
 int main(){
 
-  Matrix A, B(3);
-  Matrix C(A);
+  DenseMatrix A, B(3);
+  DenseMatrix C(A);
   Vect v(3);
 
   v(0) = 1.;
