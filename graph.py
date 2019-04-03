@@ -116,3 +116,38 @@ plt.xscale('log')
 plt.yscale('log')
 
 plt.show()
+
+
+#resvec3
+datafile = open("resvec3.json")
+data = json.load(datafile)
+plt.figure(8)
+
+for n in names:
+    plt.plot(data[n]["resvec"])
+
+plt.yscale('log')
+plt.legend(names)
+plt.title("Historiques de convergence pour $A_{"+str(data["Jacobi"]["N"])+"}$ et $b=(1,\ \dots\ , 1)$")
+plt.xlabel("$k$")
+plt.ylabel("$||r_{k}||_{\infty}/||b||_{\infty}$", fontsize='x-large')
+plt.show()
+
+
+#######time3
+plt.figure(9)
+
+for n in names:
+    plt.plot(data[n]["sizes"], data[n]["duration"])
+
+plt.plot(data[n]["sizes"], np.array(data[n]["sizes"])**3, data[n]["sizes"], np.array(data[n]["sizes"])**4)
+plt.legend(names+["$N^3$", "$N^4$"])
+plt.ylabel("$\Delta t$ en millisecondes")
+plt.xlabel("$N$")
+plt.title("durées des méthodes en fonction de la dimension pour $A_N$, version creuse")
+plt.xscale('log')
+plt.yscale('log')
+
+plt.show()
+
+

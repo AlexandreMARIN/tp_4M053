@@ -3,9 +3,17 @@
 #include <cmath>
 #include <cassert>
 #include <typeinfo>
+#include <algorithm>
+
 
 using namespace std;
 
+
+Matrix::Matrix(int N) : N_(N){}
+
+int Matrix::size() const{
+  return N_;
+}
 
 
 Vect operator*(const Matrix& A, const Vect& v){
@@ -19,14 +27,10 @@ Vect operator*(const Matrix& A, const Vect& v){
 
 
 
-DenseMatrix::DenseMatrix() : N_(3), coef_(9){}
+DenseMatrix::DenseMatrix() : Matrix(0), coef_(0){}
 
-DenseMatrix::DenseMatrix(int N) : N_(N), coef_(N*N){}
+DenseMatrix::DenseMatrix(int N) : Matrix(N), coef_(N*N){}
 
-
-int DenseMatrix::size() const{
-  return N_;
-}
 
 void DenseMatrix::display() const{
   cout << scientific << setprecision(2) << "N_ : " << N_ << "\ncoef_ :\n";
@@ -324,40 +328,18 @@ Vect operator*(const DenseMatrix& A, const Vect& v){
 
 
 
-template<class U, class V, class W>
-bool operator<(const tuple3<U, V, W>& t1, const tuple3<U, V, W>& t2){
-  if(t1.first<t2.fist || (t1.first==t2.first && (t1.second<t2.second || (t1.second==t2.second && t1.third<t2.third) ) ) ){
-    return true;
-  }
-  return false;
-}
-
-template<class U, class V, class W>
-bool operator>(const tuple3<U, V, W>& t1, const tuple3<U, V, W>& t2){
-  if(t1.first>t2.fist || (t1.first==t2.first && (t1.second>t2.second || (t1.second==t2.second && t1.third>t2.third) ) ) ){
-    return true;
-  }
-  return false;
-}
-
-template<class U, class V, class W>
-bool operator==(const tuple3<U, V, W>& t1, const tuple3<U, V, W>& t2){
-  if(t1.first==t2.fist && t1.second==t2.second && t1.third==t2.third){
-    return true;
-  }
-  return false;
-}
 
 
 
-COO::COO(const DenseMatrix& A) : data(0){
+
+COO::COO(const DenseMatrix& A) : Matrix(A.size()), data(0){
   data.reserve(A.size()*A.size());
   int i, j;
   tuple3<int, int, double> aux;
   for(i = 0;i<A.size();i++){
+    aux.first = i;
     for(j = 0;j<A.size();j++){
       if(A(i, j)!=0.0){
-	aux.first = i;
 	aux.second = j;
 	aux.third = A(i, j);
 	data.push_back(aux);
@@ -365,6 +347,55 @@ COO::COO(const DenseMatrix& A) : data(0){
     }
   }
   data.shrink_to_fit();
+}
+
+COO COO::Laplacian(int n){
+  COO Lapl(n);
+  int i, j;
+  tuple3<int, int, double> aux;
+
+  int length;
+  switch(n){
+  case 1:
+    length = 1;
+    aux.first = 0;
+    aux.second = 0;
+    aux.third = 2.0;
+    Lapl.data.push_back(aux);
+    return Lapl;
+  case 2:
+    length = 4;
+    break;
+  default:
+    length = (n-2)*3+4;
+  }
+
+  Lapl.data.reserve(length);
+
+  aux.first = 0;
+  aux.second = 0;
+  aux.third = 2.0;
+  Lapl.data.push_back(aux);
+  aux.second = 1;
+  aux.third = -1.0;
+  Lapl.data.push_back(aux);
+  for(i = 1;i<n-1;i++){
+    aux.first = i;
+    for(j = -1;j<=1;j++){
+      aux.second = i+j;
+      aux.third = (j==0)?2.0:-1.0;
+      Lapl.data.push_back(aux);
+    }
+  }
+  aux.first = n-1;
+  aux.second = n-2;
+  aux.third = -1.0;
+  Lapl.data.push_back(aux);
+  aux.second = n-1;
+  aux.third = 2.0;
+  Lapl.data.push_back(aux);
+
+  return Lapl;
 }
 
 double& COO::operator()(int i, int j){
@@ -389,10 +420,56 @@ double COO::operator()(int i, int j) const{
   return 0.0;
 }
 
+void COO::display() const{
+  cout << "N_ : " << N_ << "\ndata :\n";
+  for(const tuple3<int, int, double>& t : data){
+    cout << "\t( " << t.first << ", " << t.second << ", " << setw(10) << t.third << " )\n";
+  }
+}
+
+int COO::get_nnz() const{
+  return data.size();
+}
+
 Vect operator*(const COO& A, const Vect& v){
   Vect res(v.size());
   for(int i=0;(vector<tuple3<int, int, double> >::size_type)i<A.data.size();i++){
     res(A.data[i].first) += A.data[i].third * v(A.data[i].second);
   }
   return res;
+}
+
+
+
+CSR::CSR(const COO& A) : Matrix(A.size()), row(0), col(0), val(0){
+  //A is supposed without null lign
+  row.reserve(A.size());
+  col.reserve(A.get_nnz());
+  val.reserve(A.get_nnz());
+
+  sort(A.data.begin(), A.data.end());
+
+  row.push_back(0);
+  col.push_back(A.data[0].second);
+  val.push_back(A.data[0].third);
+  for(int i=1;i<(int)(A.data.size());i++){
+    if(A.data[i].second>A.data[i-1].second){
+      row.push_back(col.size());
+    }
+    col.push_back(A.data[i].second);
+    val.push_back(A.data[i].third);
+  }
+}
+
+
+double& operator()(int, int){
+
+}
+
+double operator()(int, int) const{
+
+}
+
+Vect operator*(const CSR&, const Vect&){
+
 }
